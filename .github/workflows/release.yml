@@ -1,0 +1,43 @@
+name: Release
+
+# Push a tag such as v1.0.0b1 (the tag must match wiimote_mouse.__version__ and have a CHANGELOG.md
+# section). Tags with a, b, rc or dev in them are published as pre-releases.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install evdev
+      - name: Check that the tag, the package version and the changelog agree
+        run: python tools/release_notes.py --check "$GITHUB_REF_NAME"
+      - name: Run the tests
+        run: python -m unittest discover -s tests -t .
+      - name: Build the archives
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          git archive --format=zip --prefix="wiimote-mouse-${version}/" -o "wiimote-mouse-${version}.zip" HEAD
+          git archive --format=tar.gz --prefix="wiimote-mouse-${version}/" -o "wiimote-mouse-${version}.tar.gz" HEAD
+          sha256sum "wiimote-mouse-${version}".* > SHA256SUMS
+      - name: Write the release notes
+        run: python tools/release_notes.py "$GITHUB_REF_NAME" > release-notes.md
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          options=()
+          if [[ "$GITHUB_REF_NAME" =~ [0-9](a|b|rc|dev)[0-9]* ]]; then
+            options+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" wiimote-mouse-*.zip wiimote-mouse-*.tar.gz SHA256SUMS \
+            --title "$GITHUB_REF_NAME" --notes-file release-notes.md "${options[@]}"

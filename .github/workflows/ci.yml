@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: python -m pip install evdev tomli pyflakes pyyaml
+      - name: Lint
+        run: python -m pyflakes wiimote_mouse tests tools
+      - name: Run the tests (the UI tests skip themselves without PyGObject)
+        run: python -m unittest discover -s tests -t . -v
+
+  ui:
+    name: UI tests (GTK 4 + libadwaita on a virtual display)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GTK and python-evdev from the distribution
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi python3-evdev python3-yaml gir1.2-gtk-4.0 gir1.2-adw-1 librsvg2-common xvfb
+      - name: Run all tests, including the UI ones
+        run: xvfb-run -a -s "-screen 0 1400x1000x24" /usr/bin/python3 -m unittest discover -s tests -t . -v
+
+  shell:
+    name: Shell scripts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck install.sh uninstall.sh

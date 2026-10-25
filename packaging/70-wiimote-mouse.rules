@@ -1,0 +1,16 @@
+# Wii MotionPlus Mouse: udev rules (installed as /etc/udev/rules.d/70-wiimote-mouse.rules)
+#
+# Goal: give the logged-in user the access the daemon needs without running anything as root.
+
+# Virtual mouse and keyboard: make /dev/uinput available even before the module is loaded,
+# and let the user at the seat write to it.
+KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
+
+# Every Wii Remote input node (buttons, MotionPlus, accelerometer, IR, extensions):
+# read, grab and rumble access for the user at the seat.
+SUBSYSTEM=="input", KERNEL=="event[0-9]*", ATTRS{name}=="Nintendo Wii Remote*", TAG+="uaccess"
+
+# The player LEDs are controlled through sysfs, which has no ACLs. Only these four
+# brightness files are opened up, and only to the "wiimote" group. Without the group,
+# LED feedback switches itself off and everything else keeps working.
+SUBSYSTEM=="leds", ACTION=="add", KERNEL=="0005:057E:03??.*:blue:p[0-3]", RUN+="/bin/sh -c 'chgrp wiimote /sys%p/brightness && chmod g+w /sys%p/brightness'"

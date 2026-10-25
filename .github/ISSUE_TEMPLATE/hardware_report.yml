@@ -1,0 +1,66 @@
+name: Hardware test report
+description: Tell us how the not-yet-verified features behave on your remote
+labels: [hardware]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Most of the logic is tested with fake devices, so reports from real remotes are very valuable.
+        Fill in whatever you tried; skip the rest.
+  - type: input
+    id: version
+    attributes:
+      label: Version (`wiimote-mouse --version`)
+    validations:
+      required: true
+  - type: dropdown
+    id: remote
+    attributes:
+      label: Remote
+      options:
+        - Wii Remote Plus (MotionPlus built in)
+        - Wii Remote + MotionPlus adapter
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: roll
+    attributes:
+      label: Roll compensation (`tilt.roll_compensation`)
+      description: Tilt the remote about 45 degrees and sweep sideways.
+      options:
+        - Not tried
+        - Works with the defaults
+        - Needs roll_invert = true
+        - Does not work
+  - type: input
+    id: battery
+    attributes:
+      label: Battery reading with fresh batteries
+      description: "`cat /sys/class/power_supply/wiimote_battery_*/capacity` and what `wiimotectl status` shows"
+  - type: dropdown
+    id: sleep
+    attributes:
+      label: Idle sleep and wake (`power.idle_sleep_seconds`)
+      options:
+        - Not tried
+        - Wakes up quickly and recalibrates
+        - Takes a long time
+        - Does not wake up
+  - type: dropdown
+    id: leds
+    attributes:
+      label: Player LEDs and rumble
+      options:
+        - Not tried
+        - Both work
+        - LEDs do not work
+        - Rumble does not work
+  - type: input
+    id: extensions
+    attributes:
+      label: Extensions you tried (Nunchuk, Classic Controller, ...) and what you saw in the UI or `wiimotectl watch --topics ext`
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else

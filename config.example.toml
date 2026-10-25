@@ -1,0 +1,70 @@
+# Wii MotionPlus Mouse: configuration
+# Location: ~/.config/wiimote-mouse/config.toml
+#
+# Every line is optional: a missing or invalid value falls back to the default.
+# Validate this file with:   wiimote-mouse --check-config
+# Changes made with wiimotectl or the UI are stored separately (overrides.json) and win
+# over this file until you reset them; if you edit a value here, your edit wins again.
+# Apply edits without restarting:   wiimotectl config reload
+
+[pointer]
+sensitivity = 30.0            # 5..80 (the + and - buttons change it while you use it)
+acceleration = 0.40           # 0 disables acceleration; higher speeds up fast sweeps more
+accel_reference_dps = 125.0   # rotation speed (deg/s) where acceleration peaks
+invert_x = true               # flip if horizontal movement is reversed
+invert_y = false              # flip if vertical movement is reversed
+
+[scroll]
+invert = false                # flip if A + tilt scrolls the wrong way
+gyro_notches_per_degree = 0.20
+hires = true                  # high-resolution wheel events (needs a restart to change)
+
+[filter]
+min_cutoff = 7.0              # lower is smoother but laggier
+beta = 0.010                  # higher reacts faster to quick movements
+
+[power]
+idle_sleep_seconds = 300      # close the MotionPlus after this much idle time (saves battery); 0 = never
+                              # Any button wakes it; hold the remote still for a moment while it calibrates.
+
+[tilt]
+# Corrects horizontal sweeps when you hold the remote twisted around its long axis.
+# The direction depends on the physical accelerometer axes and still needs checking on real
+# hardware: tilt the remote about 45 degrees and sweep sideways. If the line gets MORE
+# diagonal, set roll_invert = true.
+roll_compensation = false
+roll_invert = false
+
+[feedback]
+leds = true                   # 1 LED = connected/asleep, middle two = calibrating, 1-4 LEDs = ready (bar = sensitivity)
+rumble = true                 # 1 buzz = ready, 2 = calibration stuck, 3-4 = battery low
+notifications = true          # desktop notifications (needs notify-send)
+battery_low_percent = 20      # 1..90
+
+# ---------------------------------------------------------------------------
+# Button profiles. Built in: default, presentation, media. Switch with
+#   wiimotectl profile set presentation        or   wiimotectl profile next
+# A profile only lists what differs from "default". Buttons: a, b, one, two, plus, minus,
+# home, up, down, left, right.
+#
+# Actions:
+#   pointer.hold  scroll.hold            gyro clutch / gyro scrolling while held
+#   mouse.left  mouse.right  mouse.middle
+#   scroll.up  scroll.down  scroll.left  scroll.right
+#   sensitivity.up  sensitivity.down  calibrate  profile.next  profile.previous  none
+#   profile:<name>                       switch to a named profile
+#   key:KEY_LEFTCTRL+KEY_C               keyboard keys while held (a chord with +)
+#   exec:notify-send hello               run a command when pressed (no shell)
+# ---------------------------------------------------------------------------
+
+# Example: a key for a push-to-talk shortcut in Discord, a call app or a dictation tool.
+# [profiles.ptt]
+# description = "Button 2 is push-to-talk (F13)"
+# [profiles.ptt.buttons]
+# two = "key:KEY_F13"
+
+# Example: unmute the microphone only while button 2 is held (PipeWire).
+# [profiles.mic]
+# description = "Hold 2 to unmute the microphone"
+# [profiles.mic.buttons]
+# two = { press = "exec:wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 0", release = "exec:wpctl set-mute @DEFAULT_AUDIO_SOURCE@ 1" }

@@ -1,0 +1,16 @@
+[Unit]
+Description=Wii Remote gyro mouse
+Documentation=file://%h/.local/share/doc/wiimote-mouse/README.md
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/wiimote-mouse
+Restart=on-failure
+RestartSec=2
+# Exit status 2 means a setup or configuration problem. Retrying cannot fix it, so the
+# failure stays visible instead of restarting in a loop.
+RestartPreventExitStatus=2
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

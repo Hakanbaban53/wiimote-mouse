@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting
+    url: https://github.com/Hakanbaban53/wiimote-mouse#troubleshooting
+    about: Run `wiimote-mouse --doctor` first; the README lists the usual causes.

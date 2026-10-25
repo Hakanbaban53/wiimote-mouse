@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Wii Remote Mouse
+Comment=Use a Wii Remote as a gyro mouse
+Exec=@BIN_DIR@/wiimote-mouse-ui
+Icon=input-gaming
+Terminal=false
+Categories=Settings;HardwareSettings;
+Keywords=wii;remote;gyro;mouse;controller;
+StartupNotify=true
